@@ -2,14 +2,18 @@ package com.fortyeighthundred.finalproject.demo.web
 
 import com.fortyeighthundred.finalproject.demo.db.UserRepository
 import com.fortyeighthundred.finalproject.demo.model.User
+import com.fortyeighthundred.finalproject.demo.web.webmodels.UpdatePassword
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import javax.servlet.http.HttpSession
+import kotlin.math.log
 
 @Controller
 class SiteController {
@@ -19,7 +23,7 @@ class SiteController {
     private lateinit var userRepository: UserRepository
 
     @GetMapping("/")
-    fun index(): String {
+    fun index(httpSession: HttpSession): String {
         return "index"
     }
 
@@ -44,7 +48,8 @@ class SiteController {
     }
 
     @GetMapping("/login")
-    fun getLogin(): String {
+    fun getLogin(httpSession: HttpSession): String {
+        httpSession.id
         return "login"
     }
 
@@ -58,6 +63,44 @@ class SiteController {
         }
         //set user as session variable
         httpSession.setAttribute("user", foundUser)
+        logger.info { httpSession.attributeNames.toList().toString()}
+        logger.info { httpSession.id }
         return "loginSuccess"
+    }
+
+    @GetMapping("/account")
+    fun accountSettings(model: Model, httpSession: HttpSession): String {
+        val user = httpSession.getAttribute("user") as User?
+        logger.info { user }
+        user?.let { user ->
+            model["user"] = user
+        } ?: return "redirect:/login"
+
+        return "account"
+
+    }
+
+    @PostMapping("/updatePassword")
+    fun updatePassword(updatePassword: UpdatePassword, httpSession: HttpSession): String {
+        val user = httpSession.getAttribute("user") as User?
+        logger.info { user }
+        user?.let {
+            if (BCryptPasswordEncoder().matches(updatePassword.old, user.password)) {
+                //update password
+                val updatedUser = User(user.username, BCryptPasswordEncoder().encode(updatePassword.new))
+                userRepository.save(updatedUser)
+                httpSession.setAttribute("user", updatedUser)
+                return "redirect:/account"
+            } else {
+                return "redirect:/account"
+            }
+        } ?: return "redirect:/login"
+
+    }
+
+    @GetMapping("/logout")
+    fun logout(httpSession: HttpSession): String {
+        httpSession.invalidate()
+        return "redirect:/login"
     }
 }

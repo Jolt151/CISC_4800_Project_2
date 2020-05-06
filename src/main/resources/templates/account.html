@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Account settings</title>
+</head>
+    <body>
+    <h1>Account settings</h1>
+    <b>Username: </b> <span th:text="${user.username}">Username</span>
+    <br>
+    <h3>Change Password</h3>
+    <form action="/updatePassword" method="post">
+        <label for="old">Old Password:</label>
+        <input id="old" name="old" type="password">
+        <label for="new">New Password:</label>
+        <input id="new" name="new" type="password">
+        <input type="submit">
+    </form>
+    </body>
+</html>
