@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 fun main(args: Array<String>) {
     runApplication<DemoApplication>(*args)
@@ -21,9 +22,9 @@ class DemoApplication {
     @Bean
     fun demo(userRepository: UserRepository): CommandLineRunner {
         return CommandLineRunner {args ->
-            userRepository.save(User("testUser", "123456"))
-            userRepository.save(User("testUser2", "qwerty"))
-            userRepository.save(User("anotherUser", "hunter2"))
+            userRepository.save(User("testUser", BCryptPasswordEncoder().encode("123456")))
+            userRepository.save(User("testUser2", BCryptPasswordEncoder().encode("qwerty")))
+            userRepository.save(User("anotherUser", BCryptPasswordEncoder().encode("hunter2")))
 
             logger.info { "Loading first user..." }
             val user1 = userRepository.findByUsername("testUser")
