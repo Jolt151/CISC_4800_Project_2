@@ -5,4 +5,4 @@ import javax.persistence.Id
 
 @Entity
 data class User(@Id val username: String,
-                val hashedPassword: String)
+                val password: String)

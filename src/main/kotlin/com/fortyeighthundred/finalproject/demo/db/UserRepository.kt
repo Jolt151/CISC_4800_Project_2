@@ -5,4 +5,7 @@ import org.springframework.data.repository.CrudRepository
 
 interface UserRepository : CrudRepository<User, String> {
     fun findByUsername(username: String): User
+
+
+    //Implicit save method inherited from CrudRepository
 }

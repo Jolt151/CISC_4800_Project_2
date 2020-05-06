@@ -27,11 +27,11 @@ class DemoApplication {
 
             logger.info { "Loading first user..." }
             val user1 = userRepository.findByUsername("testUser")
-            logger.info { "user1: ${user1.username}/${user1.hashedPassword}" }
+            logger.info { "user1: ${user1.username}/${user1.password}" }
 
             logger.info { "Loading second user..." }
             val user2 = userRepository.findByUsername("testUser2")
-            logger.info { "user1: ${user2.username}/${user2.hashedPassword}" }
+            logger.info { "user1: ${user2.username}/${user2.password}" }
         }
     }
 
