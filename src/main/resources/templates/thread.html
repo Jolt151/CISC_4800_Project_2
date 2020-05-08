@@ -7,7 +7,7 @@
 <body>
 <h1 th:text="${thread.title}">Title</h1>
 <br><br>
-<ol th:each="post : ${thread.posts}">
+<ul th:each="post : ${thread.posts}">
     <li>
         <span th:text="${post.id}">id</span>
         <br>
@@ -18,6 +18,14 @@
         <br>
         <span th:text="${post.message}">message lorem ipsum dolor sit amet</span>
     </li>
-</ol>
+</ul>
+
+<form id="submission" th:action="@{'/forum/' + ${thread.id} + '/new'}" method="post">
+    <label for="message">Message</label>
+    <input id="message" name="message" size="150" height="30" style="height: 100px">
+    <br>
+    <button type="submit">Submit</button>
+</form>
+
 </body>
 </html>

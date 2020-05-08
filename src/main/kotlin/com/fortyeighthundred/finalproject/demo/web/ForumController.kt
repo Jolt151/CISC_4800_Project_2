@@ -5,6 +5,7 @@ import com.fortyeighthundred.finalproject.demo.db.ThreadRepository
 import com.fortyeighthundred.finalproject.demo.model.Post
 import com.fortyeighthundred.finalproject.demo.model.Thread
 import com.fortyeighthundred.finalproject.demo.model.User
+import com.fortyeighthundred.finalproject.demo.web.webmodels.NewMessage
 import com.fortyeighthundred.finalproject.demo.web.webmodels.NewThread
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,6 +63,20 @@ class ForumController {
 
         } ?: return "redirect:/login"
 
+    }
+
+    @PostMapping("/forum/{id}/new")
+    fun newPost(@PathVariable id: Long, httpSession: HttpSession, model: Model, newMessage: NewMessage): String {
+        (httpSession.getAttribute("user") as? User)?.let {user ->
+            val thread = threadRepository.findByIdOrNull(id) ?: throw NotFoundException()
+            val post = postRepository.save(Post(author = user, timestamp = Date(), message = newMessage.message))
+
+            threadRepository.save(Thread(thread.id, thread.title, thread.posts.plus(post)))
+
+            return "redirect:/forum/$id"
+
+
+        } ?: return "redirect:/login"
     }
 }
 
