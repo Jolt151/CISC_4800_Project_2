@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum Home</title>
+    <script>
+        function openDiscussionSubmissionBox() {
+
+        }
+    </script>
+</head>
+<body>
+<h1>Forum Home</h1>
+<br>
+
+<button type="button" onclick="openDiscussionSubmissionBox();">Start a new discussion!</button>
+<br>
+
+<form id="submission" action="/forum/new" method="post">
+    <label for="title">Title</label>
+    <input id="title" name="title" size="150">
+    <br>
+    <label for="message">Message</label>
+    <input id="message" name="message" size="150" height="30" style="height: 100px">
+    <br>
+    <button type="submit">Submit</button>
+</form>
+
+<br>
+<h2>Discussions</h2>
+<ul th:each="thread: ${threads}">
+    <li><a th:href="@{'/forum/' + ${thread.id}}"><span th:text="${thread.title}">Title</span></a></li>
+</ul>
+</body>
+</html>
