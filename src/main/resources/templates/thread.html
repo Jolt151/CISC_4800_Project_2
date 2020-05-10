@@ -5,6 +5,7 @@
     <title th:text="${thread.title}">Title</title>
 </head>
 <body>
+<div th:insert="header::header"></div>
 <h1 th:text="${thread.title}">Title</h1>
 <br><br>
 <ul th:each="post : ${thread.posts}">
