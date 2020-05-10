@@ -1,5 +1,6 @@
 package com.fortyeighthundred.finalproject.demo.web
 
+import com.fortyeighthundred.finalproject.demo.db.PostRepository
 import com.fortyeighthundred.finalproject.demo.db.UserRepository
 import com.fortyeighthundred.finalproject.demo.model.User
 import com.fortyeighthundred.finalproject.demo.web.webmodels.UpdatePassword
@@ -21,6 +22,9 @@ class SiteController {
 
     @Autowired
     private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var postRepository: PostRepository
 
     @GetMapping("/")
     fun index(httpSession: HttpSession): String {
@@ -96,6 +100,26 @@ class SiteController {
             }
         } ?: return "redirect:/login"
 
+    }
+
+    @PostMapping("/deleteAccount")
+    fun deleteAccount(httpSession: HttpSession): String {
+        val user = httpSession.getAttribute("user") as User?
+        user?.let {  user ->
+            //replace user account posts with deleted account
+            val posts = postRepository.findAll().toList()
+
+            //it is impossible to login as this account, since a BCrypt hash cannot generate this password
+            val deletedUser = User("deletedUser", "unreachablePassword")
+            userRepository.save(deletedUser)
+
+            //replace all posts from that user to be from deletedUser
+            postRepository.saveAll(posts.map { it.copy(author = deletedUser) })
+
+            //now we can delete the user
+            userRepository.delete(user)
+            return "redirect:/login"
+        } ?: return "redirect:/login"
     }
 
     @GetMapping("/logout")
