@@ -5,5 +5,5 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class User(@Id val username: String,
+data class User(@Id val username: String, //Primary Key
                 val password: String): Serializable

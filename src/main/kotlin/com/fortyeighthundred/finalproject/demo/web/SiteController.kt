@@ -26,6 +26,9 @@ class SiteController {
     @Autowired
     private lateinit var postRepository: PostRepository
 
+    /**
+     * Return the index.html page
+     */
     @GetMapping("/")
     fun index(httpSession: HttpSession): String {
         return "index"
@@ -36,6 +39,10 @@ class SiteController {
         return "register"
     }
 
+    /**
+     * Register a new user
+     * Hash the password, then create a user object and save.
+     */
     @PostMapping("/register")
     fun tryRegister(@ModelAttribute user: User): String {
         logger.info { user }
@@ -53,15 +60,20 @@ class SiteController {
 
     @GetMapping("/login")
     fun getLogin(httpSession: HttpSession): String {
-        httpSession.id
         return "login"
     }
 
+    /**
+     * POST /login
+     * Find user by username - if not found, fail login
+     * Check if passwords match using the Bcrypt hash function - if they don't, fail
+     * Set the session variable for the user and return the login page
+     */
     @PostMapping("/login")
     fun tryLogin(@ModelAttribute user: User, httpSession: HttpSession): String {
         logger.info { user }
 
-        val foundUser = userRepository.findByUsername(user.username)
+        val foundUser = userRepository.findByUsername(user.username) ?: return "loginFail"
         if (!BCryptPasswordEncoder().matches(user.password, foundUser.password)) {
             return "loginFail"
         }
@@ -72,6 +84,11 @@ class SiteController {
         return "loginSuccess"
     }
 
+    /**
+     * /account
+     * Get the user - if not logged in, redirect to login
+     * Add the user to the model
+     */
     @GetMapping("/account")
     fun accountSettings(model: Model, httpSession: HttpSession): String {
         val user = httpSession.getAttribute("user") as User?
@@ -84,6 +101,12 @@ class SiteController {
 
     }
 
+    /**
+     * /updatePassword
+     * Get user from session - if not logged in, redirect to login
+     * If old password matches, allow to continue.
+     * Create the updated user object, and save/overwrite/update the user.
+     */
     @PostMapping("/updatePassword")
     fun updatePassword(updatePassword: UpdatePassword, httpSession: HttpSession): String {
         val user = httpSession.getAttribute("user") as User?
@@ -102,6 +125,12 @@ class SiteController {
 
     }
 
+    /**
+     * If the user is authorized, allow to continue
+     * Find all the posts from the user and replace with the deletedUser
+     * This way we can delete the user safely without dangling references
+     * Delete the user and login
+     */
     @PostMapping("/deleteAccount")
     fun deleteAccount(httpSession: HttpSession): String {
         val user = httpSession.getAttribute("user") as User?
@@ -122,6 +151,10 @@ class SiteController {
         } ?: return "redirect:/login"
     }
 
+    /**
+     * /logout
+     * Invalidate the session
+     */
     @GetMapping("/logout")
     fun logout(httpSession: HttpSession): String {
         httpSession.invalidate()
